@@ -8,12 +8,7 @@ import (
 	pixgl "github.com/faiface/pixel/pixelgl"
 
 	"github.com/avitar64/Flappy_bird/engine"
-)
-
-const (
-	WindowWidth  = 624
-	WindowHeight = 916
-	FPS          = 60
+	"github.com/avitar64/Flappy_bird/game"
 )
 
 func main() {
@@ -21,13 +16,13 @@ func main() {
 }
 
 const (
-	game engine.State = 1
+	gameState engine.State = 1
 )
 
 func run() {
 	winConf := pixgl.WindowConfig{
 		Title:  "Hello, World!",
-		Bounds: pix.R(0, 0, WindowWidth, WindowHeight),
+		Bounds: pix.R(0, 0, game.WindowWidth, game.WindowHeight),
 	}
 	bgkColor := color.RGBA{
 		R: 32,
@@ -36,9 +31,13 @@ func run() {
 		A: 255,
 	}
 
-	g := engine.Initialize(winConf, FPS, bgkColor)
-	g.AddState(game)
-	g.ChangeState(game)
+	g := engine.Initialize(winConf, game.FPS, bgkColor)
+
+	b := game.NewBird()
+	bgk := game.NewBackground()
+	g.AddState(gameState)
+	g.AddComponent(gameState, bgk, b)
+	g.ChangeState(gameState)
 	g.Run()
 }
 

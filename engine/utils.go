@@ -20,9 +20,11 @@ func loadPicture(path string) (pix.Picture, error) {
 		return nil, err
 	}
 	defer file.Close()
+
 	img, _, err := image.Decode(file)
 	if err != nil {
 		return nil, err
 	}
+
 	return pix.PictureDataFromImage(img), nil
 }
