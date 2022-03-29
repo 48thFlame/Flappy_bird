@@ -55,7 +55,7 @@ func (g *Game) AddState(state State) {
 	g.StatesComponents[state] = make([]Component, 0)
 }
 
-func (g *Game) AddComponent(state State, components ...Component) {
+func (g *Game) AddComponentToState(state State, components ...Component) {
 	g.StatesComponents[state] = append(g.StatesComponents[state], components...)
 }
 

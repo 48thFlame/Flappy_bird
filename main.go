@@ -33,10 +33,9 @@ func run() {
 
 	g := engine.Initialize(winConf, game.FPS, bgkColor)
 
-	b := game.NewBird()
-	bgk := game.NewBackground()
+	gameLevel := game.NewGame(g.Win)
 	g.AddState(gameState)
-	g.AddComponent(gameState, bgk, b)
+	g.AddComponentToState(gameState, gameLevel...)
 	g.ChangeState(gameState)
 	g.Run()
 }
