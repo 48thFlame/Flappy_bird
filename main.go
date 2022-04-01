@@ -32,11 +32,9 @@ func run() {
 	}
 
 	g := engine.Initialize(winConf, game.FPS, bgkColor)
-
-	gameLevel := game.NewGame(g.Win)
 	g.AddState(gameState)
-	g.AddComponentToState(gameState, gameLevel...)
-	g.ChangeState(gameState)
+	g.AddComponentToState(gameState, game.NewLevel()...)
+
 	g.Run()
 }
 

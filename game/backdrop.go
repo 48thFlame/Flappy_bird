@@ -1,41 +1,64 @@
 package game
 
 import (
+	"fmt"
+
 	"github.com/avitar64/Flappy_bird/engine"
 	pix "github.com/faiface/pixel"
 )
 
-const (
-	fieldsStartPosName = "startPos"
-
-	groundMovementSpeed = 4
-	groundHeight = 16
-)
-
-func newBackground() *engine.Entity {
-	e := engine.NewEntity("assets/background.png", scale)
-	e.Pos = pix.V(WindowWidth/2, WindowHeight/2)
-
-	return e
+type backdrop struct {
+	spr *pix.Sprite
+	pos pix.Vec
 }
 
-func newGround() *engine.Entity {
-	e := engine.NewEntity("assets/ground.png", scale)
-
-	startPos := pix.V(WindowWidth-e.Dim.Width*e.Scale/2+40, groundHeight)
-
-	e.Fields[fieldsStartPosName] = startPos
-	e.Pos = startPos
-
-	e.Expands = append(e.Expands, groundMovement)
-
-	return e
+func (b *backdrop) Update(g *engine.Game) {
+	b.spr.Draw(g.Win, pix.IM.Moved(b.pos).Scaled(b.pos, scale))
 }
 
-func groundMovement(e *engine.Entity) {
-	if e.Pos.X < WindowWidth/2 {
-		e.Pos = e.Fields[fieldsStartPosName].(pix.Vec)
+func newBackground() *backdrop {
+	pic, err := engine.LoadPicture("assets/background.png")
+	if err != nil {
+		panic(fmt.Errorf("error loading background sprite: %v", err))
 	}
-	
-	e.Pos.X -= groundMovementSpeed
+
+	return &backdrop{
+		spr: pix.NewSprite(pic, pic.Bounds()),
+		pos: pix.V(WindowWidth/2, WindowHeight/2),
+	}
+}
+
+type ground struct {
+	back *backdrop
+	dim  *engine.Dim
+}
+
+func (gr *ground) Update(g *engine.Game) {
+	gr.back.Update(g)
+}
+
+func (gr *ground) ToRect() pix.Rect {
+	return toRect(gr.back.pos.X, gr.back.pos.Y, gr.dim.Width, gr.dim.Height)
+}
+
+func newGround() *ground {
+	pic, err := engine.LoadPicture("assets/ground.png")
+	if err != nil {
+		panic(fmt.Errorf("error loading ground sprite: %v", err))
+	}
+
+	picRect := pic.Bounds()
+	width := picRect.W()
+	height := picRect.H()
+
+	return &ground{
+		back: &backdrop{
+			spr: pix.NewSprite(pic, pic.Bounds()),
+			pos: pix.V(WindowWidth/2, WindowHeight/24),
+		},
+		dim: &engine.Dim{
+			Width:  width * scale,
+			Height: height * scale,
+		},
+	}
 }

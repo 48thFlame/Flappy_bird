@@ -1,86 +1,91 @@
 package game
 
 import (
+	"fmt"
+
 	"github.com/avitar64/Flappy_bird/engine"
 	pix "github.com/faiface/pixel"
 	pixgl "github.com/faiface/pixel/pixelgl"
 )
 
 const (
-	birdVelName         = "vel"
-	birdWinName         = "win"
-	birdGravitySpeed    = .315
-	birdGravityMaxSpeed = 8.76
+	birdGravitySpeed    = .31
+	birdMaxGravitySpeed = 9
+
+	// birdRotSpeed    = .46
+	// birdMaxRotSpeed = 9
+	// birdMaxRot      = 67.5
+
+	scale = 4
 )
 
-// func entTouchingEdge(e *engine.Entity) bool {
-
-// a function that return weather the entity is touching any edge of the window taken in count the width and height of the entity
-func entTouchingEdge(e *engine.Entity) bool {
-	return (e.Pos.X < e.Dim.Width*e.Scale/2 ||
-		e.Pos.X > WindowWidth-e.Dim.Width*e.Scale/2 ||
-		e.Pos.Y < e.Dim.Height*e.Scale/2 ||
-		e.Pos.Y > WindowHeight-e.Dim.Height*e.Scale/2)
-}
-
-func newBird(win *pixgl.Window) *engine.Entity {
-	bird := engine.NewEntity("assets/bird.png", 4)
-	bird.Pos = pix.V(bird.Dim.Width*bird.Scale*2, WindowHeight/2+bird.Dim.Height*bird.Scale)
-	// bird.Pos = pix.V(0, 0)
-	// fmt.Println("touching edge: ", entTouchingEdge(bird))
-
-	initBirdFields(bird, win)
-
-	bird.Expands = append(bird.Expands, birdMovement)
-
-	return bird
-}
-
-func initBirdFields(e *engine.Entity, win *pixgl.Window) {
-	fields := e.Fields
-
-	fields[birdVelName] = 0.0
-	fields[birdWinName] = win
-}
-
-func birdMovement(e *engine.Entity) {
-	win := e.Fields[birdWinName].(*pixgl.Window)
-	vel := e.Fields[birdVelName].(float64)
-
-	if vel > -birdGravityMaxSpeed {
-		vel += birdGravitySpeed
+func newBird(ground *ground) *bird {
+	pic, err := engine.LoadPicture("assets/bird.png")
+	if err != nil {
+		panic(fmt.Errorf("error loading bird sprite: %v", err))
 	}
 
-	if !entTouchingEdge(e) {
-		e.Pos.Y -= vel
+	picRect := pic.Bounds()
+	width := picRect.W()
+	height := picRect.H()
 
-		if win.JustPressed(pixgl.KeySpace) {
-			vel = birdGravityMaxSpeed
-		}
+	return &bird{
+		pos: pix.V(WindowWidth/5, WindowHeight/2),
+		dim: engine.Dim{
+			Width:  width * scale,
+			Height: height * scale,
+		},
+		yv:     0,
+		// rot:    0,
+		// rv:     0,
+		spr:    pix.NewSprite(pic, pic.Bounds()),
+		ground: ground,
+	}
+}
+
+type bird struct {
+	spr    *pix.Sprite
+	pos    pix.Vec
+	yv     float64 // y velocity
+	dim    engine.Dim
+	rot    float64 // in degrees
+	// rv     float64 // rotation velocity
+	ground *ground
+}
+
+func (b *bird) ToRect() pix.Rect {
+	return toRect(b.pos.X, b.pos.Y, b.dim.Width, b.dim.Height)
+}
+
+func (b *bird) Update(g *engine.Game) {
+	b.movement(g)
+
+	b.spr.Draw(g.Win, pix.IM.Moved(b.pos).Rotated(b.pos, degreesToRadians(b.rot)).Scaled(b.pos, scale))
+}
+
+func (b *bird) movement(g *engine.Game) {
+	if g.Win.JustReleased(pixgl.MouseButtonLeft) {
+		b.yv = birdMaxGravitySpeed
+		// b.rv = 0
+		// b.rot = birdMaxRot
+	}
+	// fmt.Println("birdRotChangeSpeed:", birdRotSpeed)
+
+	if b.yv > -birdMaxGravitySpeed {
+		b.yv -= birdGravitySpeed
 	}
 
-	e.Fields[birdVelName] = vel
-	
-	// if vel > -birdGravityMaxSpeed { // if velocity is more than -gravityMaxSpeed, then speed up the fall
-	// 	vel -= birdGravitySpeed
+	b.pos.Y += b.yv
+	if engine.TouchingEdge(b, g.Win.Bounds().W(), g.Win.Bounds().H()) || engine.Touching(b, b.ground) {
+		b.pos.Y -= b.yv
+	}
+
+	// if b.rv > -birdMaxRotSpeed {
+	// 	b.rv -= birdRotSpeed
 	// }
 
-	
-	// // if entTouchingEdge(e) {
-	// e.Pos.Y += vel
-	// // e.Pos.Y -= vel
-	// vel += birdGravitySpeed
-
-	// if win.JustReleased(pixgl.KeySpace) {
-	// 	vel = birdGravityMaxSpeed
+	// b.rot += b.rv
+	// if b.rot < -birdMaxRot {
+	// 	b.rot -= b.rv
 	// }
-	// // }
-
-	// // if e.Pos.Y > WindowHeight-e.Dim.Height*e.Scale/2 || e.Pos.Y < groundHeight {
-	// // 	e.Pos.Y -= vel
-	// // } else {
-	// // 	if win.JustReleased(pixgl.MouseButtonLeft) {
-	// // 		vel = birdGravityMaxSpeed
-	// // 	}
-	// // }
 }

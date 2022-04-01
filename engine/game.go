@@ -22,51 +22,45 @@ func Initialize(winConf pixgl.WindowConfig, fps int, bgkColor color.RGBA) *Game 
 	g.BgkColor = bgkColor
 	g.millsPerFrame = 1000 / float64(fps)
 	g.state = 1
-	g.StatesComponents = make(StateComponentsType)
-	g.StatesFields = make(StatesFieldsType)
+	g.states = make(statesType)
+	g.statesFields = make(statesFieldsType)
 
 	return g
 }
 
-type StateComponentsType map[State][]Component
-type StatesFieldsType map[State]map[string]interface{}
+type statesType map[State][]Component
+type statesFieldsType map[State]map[string]interface{}
 
 type Game struct {
-	WinConf          pixgl.WindowConfig
-	Win              *pixgl.Window
-	BgkColor         color.RGBA
-	millsPerFrame    float64
-	state            State
-	StatesComponents StateComponentsType
-	StatesFields     StatesFieldsType
+	WinConf       pixgl.WindowConfig
+	Win           *pixgl.Window
+	BgkColor      color.RGBA
+	millsPerFrame float64
+	state         State
+	states        statesType
+	statesFields  statesFieldsType
 }
 
 func (g *Game) update() {
-	g.Win.Clear(g.BgkColor)
-
-	for _, component := range g.StatesComponents[g.state] {
-		component.Update(g)
+	for _, c := range g.states[g.state] {
+		c.Update(g)
 	}
-
-	g.Win.Update()
-}
-
-func (g *Game) AddState(state State) {
-	g.StatesComponents[state] = make([]Component, 0)
-}
-
-func (g *Game) AddComponentToState(state State, components ...Component) {
-	g.StatesComponents[state] = append(g.StatesComponents[state], components...)
-}
-
-func (g *Game) ChangeState(state State) {
-	g.state = state
 }
 
 func (g *Game) Run() {
 	for !g.Win.Closed() {
+		g.Win.Clear(g.BgkColor)
 		g.update()
+		g.Win.Update()
 		time.Sleep(time.Millisecond * time.Duration(g.millsPerFrame))
 	}
 	g.Win.Destroy()
+}
+
+func (g *Game) AddState(state State) {
+	g.states[state] = make([]Component, 0)
+}
+
+func (g *Game) AddComponentToState(state State, c ...Component) {
+	g.states[state] = append(g.states[state], c...)
 }
