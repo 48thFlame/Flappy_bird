@@ -54,6 +54,7 @@ func (g *Game) Run() {
 		g.Win.Update()
 		time.Sleep(time.Millisecond * time.Duration(g.millsPerFrame))
 	}
+
 	g.Win.Destroy()
 }
 

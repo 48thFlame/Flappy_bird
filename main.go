@@ -3,6 +3,8 @@ package main
 import (
 	"image/color"
 	_ "image/png"
+	"math/rand"
+	"time"
 
 	pix "github.com/faiface/pixel"
 	pixgl "github.com/faiface/pixel/pixelgl"
@@ -20,6 +22,8 @@ const (
 )
 
 func run() {
+	rand.Seed(time.Now().UnixNano())
+
 	winConf := pixgl.WindowConfig{
 		Title:  "Hello, World!",
 		Bounds: pix.R(0, 0, game.WindowWidth, game.WindowHeight),

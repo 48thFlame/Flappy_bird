@@ -11,9 +11,12 @@ const (
 func NewLevel() []engine.Component {
 	bgk := newBackground()
 	ground := newGround()
-	bird := newBird(ground)
+	pipeMa := newPipeManager()
+	bird := newBird(ground, pipeMa)
+
 	return []engine.Component{
 		bgk,
+		pipeMa,
 		ground,
 		bird,
 	}

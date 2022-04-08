@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	birdGravitySpeed    = .31
-	birdMaxGravitySpeed = 9
+	birdGravitySpeed    = .45
+	birdMaxGravitySpeed = 20
 
 	// birdRotSpeed    = .46
 	// birdMaxRotSpeed = 9
@@ -19,7 +19,7 @@ const (
 	scale = 4
 )
 
-func newBird(ground *ground) *bird {
+func newBird(ground *ground, pipeMa *pipeManager) *bird {
 	pic, err := engine.LoadPicture("assets/bird.png")
 	if err != nil {
 		panic(fmt.Errorf("error loading bird sprite: %v", err))
@@ -35,11 +35,12 @@ func newBird(ground *ground) *bird {
 			Width:  width * scale,
 			Height: height * scale,
 		},
-		yv:     0,
+		yv: 0,
 		// rot:    0,
 		// rv:     0,
 		spr:    pix.NewSprite(pic, pic.Bounds()),
 		ground: ground,
+		pipeMa: pipeMa,
 	}
 }
 
@@ -49,8 +50,9 @@ type bird struct {
 	yv     float64 // y velocity
 	dim    engine.Dim
 	rot    float64 // in degrees
-	// rv     float64 // rotation velocity
 	ground *ground
+	pipeMa *pipeManager
+	// rv     float64 // rotation velocity
 }
 
 func (b *bird) ToRect() pix.Rect {
@@ -59,17 +61,20 @@ func (b *bird) ToRect() pix.Rect {
 
 func (b *bird) Update(g *engine.Game) {
 	b.movement(g)
+	// dead := b.pipeCollide()
+	// if dead {
+	// 	fmt.Println(dead)
+	// }
 
 	b.spr.Draw(g.Win, pix.IM.Moved(b.pos).Rotated(b.pos, degreesToRadians(b.rot)).Scaled(b.pos, scale))
 }
 
 func (b *bird) movement(g *engine.Game) {
 	if g.Win.JustReleased(pixgl.MouseButtonLeft) {
-		b.yv = birdMaxGravitySpeed
+		b.yv = birdMaxGravitySpeed / 2
 		// b.rv = 0
 		// b.rot = birdMaxRot
 	}
-	// fmt.Println("birdRotChangeSpeed:", birdRotSpeed)
 
 	if b.yv > -birdMaxGravitySpeed {
 		b.yv -= birdGravitySpeed
@@ -89,3 +94,22 @@ func (b *bird) movement(g *engine.Game) {
 	// 	b.rot -= b.rv
 	// }
 }
+
+// func (b *bird) pipeCollide() bool {
+// 	for _, p := range b.pipeMa.pipes {
+// 		// if toRect(p.bPos.X, p.bPos.Y, p.bDim.Width, p.bDim.Height).Intersects(b.ToRect()) ||
+// 		// 	toRect(p.tPos.X, p.tPos.Y, p.tDim.Width, p.tDim.Height).Intersects(b.ToRect()) {
+// 		// 	return true
+// 		// }
+// 		bW, bH := b.dim.Width, b.dim.Height
+// 		bR := toRect(p.bPos.X-bW/2, p.bPos.Y-bH/2, bW, bH)
+
+// 		tW, tH := p.tDim.Width, p.tDim.Height
+// 		tR := toRect(p.tPos.X-tW/2, p.tPos.Y-tH/2, tW, tH)
+
+// 		if b.ToRect().Intersects(bR) || b.ToRect().Intersects(tR) {
+// 			return true
+// 		}
+// 	}
+// 	return false
+// }

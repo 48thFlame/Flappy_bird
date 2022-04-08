@@ -54,7 +54,7 @@ func newGround() *ground {
 	return &ground{
 		back: &backdrop{
 			spr: pix.NewSprite(pic, pic.Bounds()),
-			pos: pix.V(WindowWidth/2, WindowHeight/24),
+			pos: pix.V(WindowWidth/2, WindowHeight/42),
 		},
 		dim: &engine.Dim{
 			Width:  width * scale,
