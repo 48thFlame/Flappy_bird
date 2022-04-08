@@ -25,7 +25,7 @@ func run() {
 	rand.Seed(time.Now().UnixNano())
 
 	winConf := pixgl.WindowConfig{
-		Title:  "Hello, World!",
+		Title:  "Flappy Bird",
 		Bounds: pix.R(0, 0, game.WindowWidth, game.WindowHeight),
 	}
 	bgkColor := color.RGBA{
