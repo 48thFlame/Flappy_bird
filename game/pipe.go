@@ -46,7 +46,11 @@ type pipePart struct {
 }
 
 func (pt *pipePart) Update(g *engine.Game) {
-	pt.pos.X -= pipeSpeed
+	dead := g.GetStateField(GameState, "gameOver").(bool)
+
+	if !dead {
+		pt.pos.X -= pipeSpeed
+	}
 
 	pt.spr.Draw(g.Win, pix.IM.Moved(pt.pos).Scaled(pt.pos, scale))
 }

@@ -21,7 +21,6 @@ func Initialize(winConf pixgl.WindowConfig, fps int, bgkColor color.RGBA) *Game 
 	g.Win = win
 	g.BgkColor = bgkColor
 	g.millsPerFrame = 1000 / float64(fps)
-	g.state = 1
 	g.states = make(statesType)
 	g.statesFields = make(statesFieldsType)
 

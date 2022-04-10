@@ -8,10 +8,6 @@ const (
 	FPS          = 60
 )
 
-const (
-	GameState engine.State = 1
-)
-
 func NewLevel() []engine.Component {
 	bgk := newBackground()
 	ground := newGround()

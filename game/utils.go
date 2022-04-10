@@ -4,6 +4,7 @@ import (
 	"math"
 
 	pix "github.com/faiface/pixel"
+	pixgl "github.com/faiface/pixel/pixelgl"
 )
 
 const (
@@ -18,4 +19,8 @@ func toRect(x, y, w, h float64) pix.Rect {
 
 func degreesToRadians(degrees float64) float64 {
 	return degrees * (math.Pi / 180)
+}
+
+func gotUserInput(win *pixgl.Window) bool {
+	return win.JustReleased(pixgl.KeySpace) || win.JustReleased(pixgl.MouseButtonLeft)
 }

@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/avitar64/Flappy_bird/engine"
+
 	pix "github.com/faiface/pixel"
 	"github.com/faiface/pixel/text"
 	"golang.org/x/image/font/basicfont"
@@ -17,13 +18,16 @@ var (
 func newScoreWritter() *scoreWritter {
 	atlas := text.NewAtlas(basicfont.Face7x13, digits)
 	text := text.New(scoreTextSpot, atlas)
+	pos := text.Orig
 
 	return &scoreWritter{
+		pos:  pos,
 		text: text,
 	}
 }
 
 type scoreWritter struct {
+	pos  pix.Vec
 	text *text.Text
 }
 
@@ -33,5 +37,5 @@ func (sw *scoreWritter) Update(g *engine.Game) {
 	sw.text.Clear()
 	fmt.Fprint(sw.text, score)
 
-	sw.text.Draw(g.Win, pix.IM.Scaled(sw.text.Orig, scale))
+	sw.text.Draw(g.Win, pix.IM.Scaled(sw.pos, scale))
 }

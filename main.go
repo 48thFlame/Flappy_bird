@@ -33,9 +33,10 @@ func run() {
 
 	g := engine.Initialize(winConf, game.FPS, bgkColor)
 
-	g.CreateState(game.GameState)
-	g.AddComponentsToState(game.GameState, game.NewLevel()...)
-	g.SetStateField(game.GameState, "score", 0)
+	game.MakeGameState(g)
+	g.ChangeState(game.GameState)
+
+	game.MakeGameOverState(g)
 
 	g.Run()
 }

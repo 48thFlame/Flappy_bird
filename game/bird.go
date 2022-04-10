@@ -5,7 +5,6 @@ import (
 
 	"github.com/avitar64/Flappy_bird/engine"
 	pix "github.com/faiface/pixel"
-	pixgl "github.com/faiface/pixel/pixelgl"
 )
 
 const (
@@ -25,7 +24,7 @@ func newBird(ground *ground, pipeMa *pipeManager) *bird {
 	height := picRect.H()
 
 	return &bird{
-		pos: pix.V(WindowWidth/5, WindowHeight/2),
+		pos: pix.V(WindowWidth/5, WindowHeight-128),
 		dim: engine.Dim{
 			Width:  width * scale,
 			Height: height * scale,
@@ -54,10 +53,16 @@ func (b *bird) ToRect() pix.Rect {
 func (b *bird) Update(g *engine.Game) {
 	b.movement(g)
 
-	// dead := b.pipeCollide()
-	// if dead {
-	// 	fmt.Println("dead")
-	// }
+	gameOver := g.GetStateField(GameState, "gameOver").(bool)
+	yDifferBG := b.pos.Y - b.ground.back.pos.Y
+	if gameOver && yDifferBG < b.dim.Height+b.ground.dim.Height/2 { // if game ended and bird fell the hole way down
+		g.ChangeState(GameOver)
+	}
+
+	dead := b.pipeCollide()
+	if dead {
+		g.SetStateField(GameState, "gameOver", true)
+	}
 
 	b.incremtnScore(g)
 
@@ -65,8 +70,12 @@ func (b *bird) Update(g *engine.Game) {
 }
 
 func (b *bird) movement(g *engine.Game) {
-	if g.Win.JustReleased(pixgl.MouseButtonLeft) {
-		b.yv = birdJumpSpeed
+	dead := g.GetStateField(GameState, "gameOver").(bool)
+
+	if !dead {
+		if gotUserInput(g.Win) {
+			b.yv = birdJumpSpeed
+		}
 	}
 
 	if b.yv > -birdMaxGravitySpeed {
