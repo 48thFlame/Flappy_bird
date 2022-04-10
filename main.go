@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"image/color"
 	_ "image/png"
 	"math/rand"
@@ -20,9 +21,15 @@ func main() {
 func run() {
 	rand.Seed(time.Now().UnixNano())
 
+	icon, err := engine.LoadPicture("assets/flappybird.png")
+	if err != nil {
+		panic(fmt.Errorf("error loading icon: %v", err))
+	}
+
 	winConf := pixgl.WindowConfig{
 		Title:  "Flappy Bird",
 		Bounds: pix.R(0, 0, game.WindowWidth, game.WindowHeight),
+		Icon:   []pix.Picture{icon},
 	}
 	bgkColor := color.RGBA{
 		R: 32,
