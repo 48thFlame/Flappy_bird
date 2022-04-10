@@ -60,6 +60,10 @@ func (g *Game) Run() {
 	g.Win.Destroy()
 }
 
+func (g *Game) ChangeState(state State) {
+	g.state = state
+}
+
 func (g *Game) CreateState(state State) {
 	g.states[state] = make([]Component, 0)
 }
