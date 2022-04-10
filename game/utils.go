@@ -6,6 +6,10 @@ import (
 	pix "github.com/faiface/pixel"
 )
 
+const (
+	scale = 4
+)
+
 func toRect(x, y, w, h float64) pix.Rect {
 	hw, hh := w/2, h/2
 

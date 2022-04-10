@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	pipeSpeed     = 4.71
+	pipeSpeed     = 5.71
 	pipeXDistance = 365
 	pipeYDistance = 700
 )

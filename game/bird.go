@@ -9,14 +9,9 @@ import (
 )
 
 const (
-	birdGravitySpeed    = .45
+	birdGravitySpeed    = .65
 	birdMaxGravitySpeed = 20
-
-	// birdRotSpeed    = .46
-	// birdMaxRotSpeed = 9
-	// birdMaxRot      = 67.5
-
-	scale = 4
+	birdJumpSpeed       = birdMaxGravitySpeed / 1.75
 )
 
 func newBird(ground *ground, pipeMa *pipeManager) *bird {
@@ -35,9 +30,7 @@ func newBird(ground *ground, pipeMa *pipeManager) *bird {
 			Width:  width * scale,
 			Height: height * scale,
 		},
-		yv: 0,
-		// rot:    0,
-		// rv:     0,
+		yv:     0,
 		spr:    pix.NewSprite(pic, pic.Bounds()),
 		ground: ground,
 		pipeMa: pipeMa,
@@ -52,7 +45,6 @@ type bird struct {
 	rot    float64 // in degrees
 	ground *ground
 	pipeMa *pipeManager
-	// rv     float64 // rotation velocity
 }
 
 func (b *bird) ToRect() pix.Rect {
@@ -61,19 +53,20 @@ func (b *bird) ToRect() pix.Rect {
 
 func (b *bird) Update(g *engine.Game) {
 	b.movement(g)
+
 	// dead := b.pipeCollide()
 	// if dead {
-	// 	fmt.Println(dead)
+	// 	fmt.Println("dead")
 	// }
+
+	b.incremtnScore(g)
 
 	b.spr.Draw(g.Win, pix.IM.Moved(b.pos).Rotated(b.pos, degreesToRadians(b.rot)).Scaled(b.pos, scale))
 }
 
 func (b *bird) movement(g *engine.Game) {
 	if g.Win.JustReleased(pixgl.MouseButtonLeft) {
-		b.yv = birdMaxGravitySpeed / 2
-		// b.rv = 0
-		// b.rot = birdMaxRot
+		b.yv = birdJumpSpeed
 	}
 
 	if b.yv > -birdMaxGravitySpeed {
@@ -84,32 +77,25 @@ func (b *bird) movement(g *engine.Game) {
 	if engine.TouchingEdge(b, g.Win.Bounds().W(), g.Win.Bounds().H()) || engine.Touching(b, b.ground) {
 		b.pos.Y -= b.yv
 	}
-
-	// if b.rv > -birdMaxRotSpeed {
-	// 	b.rv -= birdRotSpeed
-	// }
-
-	// b.rot += b.rv
-	// if b.rot < -birdMaxRot {
-	// 	b.rot -= b.rv
-	// }
 }
 
-// func (b *bird) pipeCollide() bool {
-// 	for _, p := range b.pipeMa.pipes {
-// 		// if toRect(p.bPos.X, p.bPos.Y, p.bDim.Width, p.bDim.Height).Intersects(b.ToRect()) ||
-// 		// 	toRect(p.tPos.X, p.tPos.Y, p.tDim.Width, p.tDim.Height).Intersects(b.ToRect()) {
-// 		// 	return true
-// 		// }
-// 		bW, bH := b.dim.Width, b.dim.Height
-// 		bR := toRect(p.bPos.X-bW/2, p.bPos.Y-bH/2, bW, bH)
+func (b *bird) pipeCollide() bool {
+	for _, pipe := range b.pipeMa.pipes {
+		if engine.Touching(b, pipe.bottom) || engine.Touching(b, pipe.top) {
+			return true
+		}
+	}
 
-// 		tW, tH := p.tDim.Width, p.tDim.Height
-// 		tR := toRect(p.tPos.X-tW/2, p.tPos.Y-tH/2, tW, tH)
+	return false
+}
 
-// 		if b.ToRect().Intersects(bR) || b.ToRect().Intersects(tR) {
-// 			return true
-// 		}
-// 	}
-// 	return false
-// }
+func (b *bird) incremtnScore(g *engine.Game) {
+	for _, pipe := range b.pipeMa.pipes {
+		posDifference := b.pos.X - pipe.bottom.pos.X
+		// cant just check if bird.pos.x is bigger then pipe, so only adds score for each pipe once
+		if posDifference > 0 && posDifference < pipeSpeed {
+			score := g.GetStateField(GameState, "score").(int)
+			g.SetStateField(GameState, "score", score+1)
+		}
+	}
+}

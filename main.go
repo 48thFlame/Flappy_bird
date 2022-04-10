@@ -17,10 +17,6 @@ func main() {
 	pixgl.Run(run)
 }
 
-const (
-	gameState engine.State = 1
-)
-
 func run() {
 	rand.Seed(time.Now().UnixNano())
 
@@ -36,8 +32,10 @@ func run() {
 	}
 
 	g := engine.Initialize(winConf, game.FPS, bgkColor)
-	g.AddState(gameState)
-	g.AddComponentToState(gameState, game.NewLevel()...)
+
+	g.CreateState(game.GameState)
+	g.AddComponentsToState(game.GameState, game.NewLevel()...)
+	g.SetStateField(game.GameState, "score", 0)
 
 	g.Run()
 }
