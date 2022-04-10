@@ -50,18 +50,28 @@ func (g *Game) update() {
 func (g *Game) Run() {
 	for !g.Win.Closed() {
 		g.Win.Clear(g.BgkColor)
+
 		g.update()
 		g.Win.Update()
+
 		time.Sleep(time.Millisecond * time.Duration(g.millsPerFrame))
 	}
 
 	g.Win.Destroy()
 }
 
-func (g *Game) AddState(state State) {
+func (g *Game) CreateState(state State) {
 	g.states[state] = make([]Component, 0)
 }
 
-func (g *Game) AddComponentToState(state State, c ...Component) {
+func (g *Game) AddComponentsToState(state State, c ...Component) {
 	g.states[state] = append(g.states[state], c...)
+}
+
+func (g *Game) SetStateField(state State, field string, value interface{}) {
+	g.statesFields[state][field] = value
+}
+
+func (g *Game) GetStateField(state State, field string) interface{} {
+	return g.statesFields[state][field]
 }
