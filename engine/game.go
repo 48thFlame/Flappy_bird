@@ -69,6 +69,10 @@ func (g *Game) AddComponentsToState(state State, c ...Component) {
 }
 
 func (g *Game) SetStateField(state State, field string, value interface{}) {
+	if g.statesFields[state] == nil {
+		g.statesFields[state] = make(map[string]interface{})
+	}
+
 	g.statesFields[state][field] = value
 }
 
