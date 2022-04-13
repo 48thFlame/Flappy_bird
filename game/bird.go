@@ -101,8 +101,10 @@ func (b *bird) pipeCollide() bool {
 func (b *bird) incremtnScore(g *engine.Game) {
 	for _, pipe := range b.pipeMa.pipes {
 		posDifference := b.pos.X - pipe.bottom.pos.X
+
+		dead := g.GetStateField(GameState, "gameOver").(bool)
 		// cant just check if bird.pos.x is bigger then pipe, so only adds score for each pipe once
-		if posDifference > 0 && posDifference < pipeSpeed {
+		if posDifference > 0 && posDifference < pipeSpeed && !dead {
 			score := g.GetStateField(GameState, "score").(int)
 			g.SetStateField(GameState, "score", score+1)
 		}
